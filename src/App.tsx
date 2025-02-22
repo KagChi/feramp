@@ -1,16 +1,35 @@
-import Footer from '@components/Footer'
-import Header from '@components/Header'
-import Main from '@components/Main'
-import type { Component } from 'solid-js'
+import { useState } from "react";
+import { invoke } from "@tauri-apps/api/core";
 
-const App: Component = () => {
+function App() {
+  const [greetMsg, setGreetMsg] = useState("");
+  const [name, setName] = useState("");
+
+  async function greet() {
+    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
+    setGreetMsg(await invoke("greet", { name }));
+  }
+
   return (
-    <div class="min-h-screen flex flex-col items-center justify-center bg-gray-100">
-      <Header />
-      <Main />
-      <Footer />
-    </div>
-  )
+    <main>
+      <h1 className="text-xs text-teal-300">Welcome to Tauri + React</h1>
+      <form
+        className="row"
+        onSubmit={(e) => {
+          e.preventDefault();
+          greet();
+        }}
+      >
+        <input
+          id="greet-input"
+          onChange={(e) => setName(e.currentTarget.value)}
+          placeholder="Enter a name..."
+        />
+        <button type="submit">Greet</button>
+      </form>
+      <p>{greetMsg}</p>
+    </main>
+  );
 }
 
-export default App
+export default App;
